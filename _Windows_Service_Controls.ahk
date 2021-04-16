@@ -40,7 +40,8 @@
 
 ; ==================================================================================
 ; ==================================================================================
-
+; State:   "Active", "Inactive" or "" for all
+; SvcType: "Driver", "All", or "" for services only
 Service_List(State:="", SvcType:="") {
     Static STANDARD_RIGHTS_READ:=0x20000, SC_MANAGER_ENUMERATE_SERVICE:=0x4, SC_MANAGER_QUERY_LOCK_STATUS:=0x10, SC_MANAGER_CONNECT:=0x1, SC_MANAGER_ALL_ACCESS := 0xF003F
     Static SERVICE_FILE_SYSTEM_DRIVER:=0x2, SERVICE_KERNEL_DRIVER:=0x1, SERVICE_WIN32_OWN_PROCESS:=0x10, SERVICE_WIN32_SHARE_PROCESS:=0x20, SERVICE_INTERACTIVE_PROCESS:=0x100
@@ -306,16 +307,12 @@ Service_Add(ServiceName, BinaryPath, StartType:="", DisplayName:="") {
     Return result
 }
 
-Service_Delete(ServiceName:="") {
+Service_Delete(ServiceName) {
     if !A_IsAdmin ;Requires Administrator rights
         Return False
     funcName1 := (!StrLen(Chr(0xFFFF))) ? "OpenSCManagerA" : "OpenSCManagerW"
     funcName2 := (!StrLen(Chr(0xFFFF))) ? "OpenServiceA" : "OpenServiceW"
     
-    ; ServiceName := ServiceName ? ServiceName : DisplayName ? _GetName_(DisplayName) : ""
-    If (ServiceName="")
-        return ""
-
     SCM_HANDLE := DllCall("advapi32\" funcName1
                         , "Int", 0 ;NULL for local
                         , "Int", 0
