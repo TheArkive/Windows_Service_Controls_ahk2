@@ -71,7 +71,7 @@ Service_List(State:="", SvcType:="") {
                 ,"UInt*", 0                        ; lpServicesReturned ; was UIntP
                 ,"UInt*", 0)                       ; lpResumeHandle ; was UIntP
     
-    ENUM_SERVICE_STATUS := BufferAlloc(bSize, 0) ;prepare struct
+    ENUM_SERVICE_STATUS := Buffer(bSize, 0) ;prepare struct
     
     DllCall("advapi32\" funcName ;actual enumeration
            ,"Ptr", SCM_HANDLE,"UInt", ServiceType,"UInt", ServiceState,"Ptr", ENUM_SERVICE_STATUS.Ptr
@@ -113,7 +113,7 @@ Service_List(State:="", SvcType:="") {
                     ,"UInt", 0              ; cbBufSize
                     ,"UInt*", &bSize:=0)    ; pcbBytesNeeded
         
-        QUERY_SERVICE_CONFIG := BufferAlloc(bSize,0)
+        QUERY_SERVICE_CONFIG := Buffer(bSize,0)
         r := DllCall("advapi32\" funcName2,"Ptr",hSvc,"Ptr",QUERY_SERVICE_CONFIG.Ptr, "UInt", bSize, "UInt*", 0)
         
         If (bSize) {
@@ -131,7 +131,7 @@ Service_List(State:="", SvcType:="") {
             
             r := DllCall("advapi32\" funcName3 ; QueryServiceConfig2
                        , "Ptr", hSvc, "UInt", SERVICE_CONFIG_DESCRIPTION, "Ptr", 0, "UInt", 0, "UInt*", &bSize:=0)
-            SERVICE_DESCRIPTION := BufferAlloc(bSize,0)
+            SERVICE_DESCRIPTION := Buffer(bSize,0)
             
             if (bSize) {
                 r := DllCall("advapi32\" funcName3, "Ptr", hSvc, "UInt", SERVICE_CONFIG_DESCRIPTION
@@ -141,7 +141,7 @@ Service_List(State:="", SvcType:="") {
             }
             
             r := DllCall("advapi32\" funcName3, "Ptr", hSvc, "UInt", SERVICE_CONFIG_DELAYED_AUTO_START_INFO, "Ptr", 0, "UInt", 0, "UInt*", bSize:=0)
-            SERVICE_DELAYED_AUTO_START_INFO := BufferAlloc(bSize,0)
+            SERVICE_DELAYED_AUTO_START_INFO := Buffer(bSize,0)
             
             if (bSize) {
                 r := DllCall("advapi32\" funcName3, "Ptr", hSvc, "UInt", SERVICE_CONFIG_DELAYED_AUTO_START_INFO
@@ -151,7 +151,7 @@ Service_List(State:="", SvcType:="") {
             
             r := DllCall("advapi32\" funcName3, "Ptr", hSvc, "UInt", SERVICE_CONFIG_TRIGGER_INFO
                        , "Ptr", 0, "UInt", 0, "UInt*", &bSize:=0)
-            SERVICE_TRIGGER_INFO := BufferAlloc(bSize,0)
+            SERVICE_TRIGGER_INFO := Buffer(bSize,0)
             
             If (bSize) {
                 r := DllCall("advapi32\" funcName3, "Ptr", hSvc, "UInt", SERVICE_CONFIG_TRIGGER_INFO
@@ -217,7 +217,7 @@ Service_Stop(ServiceName) {
     If (!hSvc)
         result := 0, LastErr := 0
     Else {
-        SERVICE_STATUS := BufferAlloc((A_PtrSize=4)?28:32,0)
+        SERVICE_STATUS := Buffer((A_PtrSize=4)?28:32,0)
         result := DllCall("advapi32\ControlService", "UPtr", hSvc, "UInt", 1, "Ptr", SERVICE_STATUS.ptr)
         LastErr := A_LastError
         DllCall("advapi32\CloseServiceHandle", "Ptr", hSvc), SERVICE_STATUS := ""
@@ -253,7 +253,7 @@ Service_State(ServiceName, textResult:=false) { ; Return Values
     If (!hSvc)
         result := 0
     Else {
-        SC_STATUS := BufferAlloc(28, 0)
+        SC_STATUS := Buffer(28, 0)
         r := DllCall("advapi32\QueryServiceStatus"
                          , "Ptr", hSvc
                          , "Ptr", SC_STATUS.ptr)
@@ -346,7 +346,7 @@ Service_Delete(ServiceName) {
     ; SCM_HANDLE := DllCall("advapi32\OpenSCManager" , "Int", 0, "Int", 0, "UInt", 0x1) ;SC_MANAGER_CONNECT (0x0001)
     
     ; bSize := StrPut(DisplayName)
-    ; bDispName := BufferAlloc(bSize,0)
+    ; bDispName := Buffer(bSize,0)
     ; StrPut(DisplayName,bDispName)
     
     ; r1 := DllCall("advapi32\GetServiceKeyName" ; funcName2 ;Get Buffer Size
@@ -356,7 +356,7 @@ Service_Delete(ServiceName) {
             ; , "UInt*", bufSize:=0)
     
     ; bufSize := StrLen(Chr(0xFFFF)) ? (bufSize+1)*2 : (bufSize+1)
-    ; Buffer := BufferAlloc(bufSize) ;Prepare Buffer
+    ; Buffer := Buffer(bufSize) ;Prepare Buffer
 
     ; r2 := DllCall("advapi32\GetServiceKeyName" ; funcName2 ;Get Actual Service Name
         ; , "UPtr", SCM_HANDLE
