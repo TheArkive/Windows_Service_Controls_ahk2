@@ -102,7 +102,7 @@ Service_List(State:="", SvcType:="") {
                        ,"UInt", SC_MANAGER_ALL_ACCESS)  ; dwDesiredAccess - SC_MANAGER_ALL_ACCESS := 0xF003F
         
         if (!hSvc) {
-            readOnly := truehow
+            readOnly := true
             permRequest := STANDARD_RIGHTS_READ | SC_MANAGER_ENUMERATE_SERVICE | SC_MANAGER_QUERY_LOCK_STATUS | SC_MANAGER_CONNECT
             hSvc := DllCall("advapi32\" funcName1, "Ptr", SCM_HANDLE, "Ptr", StrPtr(SvcName), "UInt", permRequest)
         }
